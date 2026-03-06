@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from bub.prompt_escape import escape_prompt_attr, escape_prompt_text
 from bub.tools.registry import ToolRegistry
 
 
@@ -40,7 +41,7 @@ class ProgressiveToolView:
     def compact_block(self) -> str:
         lines = ["<tool_view>"]
         for row in self.registry.compact_rows(for_model=True):
-            lines.append(f"  - {row}")
+            lines.append(f"  - {escape_prompt_text(row)}")
         lines.append("</tool_view>")
         return "\n".join(lines)
 
@@ -55,9 +56,9 @@ class ProgressiveToolView:
                 detail = self.registry.detail(name, for_model=True)
             except KeyError:
                 continue
-            lines.append(f'  <tool name="{model_name}">')
+            lines.append(f'  <tool name="{escape_prompt_attr(model_name)}">')
             for line in detail.splitlines():
-                lines.append(f"    {line}")
+                lines.append(f"    {escape_prompt_text(line)}")
             lines.append("  </tool>")
         lines.append("</tool_details>")
         return "\n".join(lines)

@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import time
 from dataclasses import dataclass
-from html import escape
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +12,7 @@ from republic import ToolContext
 
 from bub.core.commands import ParsedArgs, parse_command_words, parse_internal_command, parse_kv_arguments
 from bub.core.types import DetectedCommand
+from bub.prompt_escape import escape_prompt_attr, escape_prompt_text
 from bub.tape.service import TapeService
 from bub.tools.progressive import ProgressiveToolView
 from bub.tools.registry import ToolRegistry
@@ -30,9 +30,9 @@ class CommandExecutionResult:
 
     def block(self) -> str:
         # Escape command payload so tool output cannot close or forge command tags.
-        safe_name = escape(self.name, quote=True)
-        safe_status = escape(self.status, quote=True)
-        safe_output = escape(self.output, quote=False)
+        safe_name = escape_prompt_attr(self.name)
+        safe_status = escape_prompt_attr(self.status)
+        safe_output = escape_prompt_text(self.output)
         return f'<command name="{safe_name}" status="{safe_status}">\n{safe_output}\n</command>'
 
 
